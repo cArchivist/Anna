@@ -1,0 +1,14 @@
+{
+	"name": "anna",
+	"version": "1.0.0",
+	"description": "Bot that assigns cosmetic roles to users and enables fun interaction within the server",
+	"main": "bot.js",
+	"author": "Silas (crimeanarchivist)",
+	"license": "UNLICENSED",
+	"private": true,
+	"dependencies": {
+		"bufferutil": "^3.0.2",
+		"discord.js": "^11.2.1",
+		"winston": "^2.4.0"
+	}
+}
