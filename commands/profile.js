@@ -24,7 +24,9 @@ exports.run = (client, message, args) => {
 		}
 		//var factionRole = roles.first();
 	});
-	var name = (message.member.nickname != null) ? message.member.nickname : message.member.user.username;
+	var member = message.guild.fetchMember(message.author)
+	console.log(`Received user info: ${member.nickname}`)
+	var name = (member.nickname != null) ? member.nickname : member.user.username;
 	var descriptions = require("../descriptions.json");
 	var id = message.author.id;
 	var desc;
@@ -42,15 +44,15 @@ exports.run = (client, message, args) => {
 		memClass = "This user has no class.";
 	}
 	
-	var memberRank = rank(message.member);
+	var memberRank = rank(member);
 	let embedMsg = new Discord.RichEmbed()
 		.setTitle(name)
-		.setThumbnail(message.member.user.displayAvatarURL)
+		.setThumbnail(member.user.displayAvatarURL)
 		.setDescription(desc)
-		.setColor(message.member.colorRole.hexColor)
-		.addField("Faction and Rank", `${message.member.colorRole.name} ${memberRank}`)
+		.setColor(member.colorRole.hexColor)
+		.addField("Faction and Rank", `${member.colorRole.name} ${memberRank}`)
 		.addField("Class", `${memClass}`)
-		.addField("Member Since", `${message.member.joinedAt}`)
+		.addField("Member Since", `${member.joinedAt}`)
 	  message.channel.send(embedMsg).catch(console.error);
 	  return;
 };

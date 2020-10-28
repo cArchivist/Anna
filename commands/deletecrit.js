@@ -16,11 +16,6 @@ exports.run = (client, message, args) => {
 	fs.writeFile('./crits.json', JSON.stringify(crits, null, 2), "utf8", function(err) {
 		if (err) return console.log(err);
 	});
-	return;
-	
-	fs.writeFile('./crits.json', JSON.stringify(crits, null, 2), "utf8", function(err) {
-		if (err) return console.log(err);
-	});
 	message.channel.send(`I added your quote!  Now you have ${userCrits}`);
 	return;
 

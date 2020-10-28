@@ -58,6 +58,7 @@ If you're a Villager rank or above, you can join a faction, which changes your n
 			break;
 		case "convert":
 			response = `**$convert** [value]\nConverts the *value* you give me into another unit.\nExample:\n'$convert 32F' will get 0C.\nRight now I can handle:\n>Temperature (F/C)`
+			break;
 		default:
 			response = "Hiya!  Here's what I have in stock:\n\n**Commands**\n>$ping\n>$profile\n>$faction [faction name]\n>$setDescription [description]\n>$setClass [class]\n>$addCrit [quote]\n>$deleteCrit [quote]\n>$crit [option]\n\nTry one or say `$help [command]` to learn more!";
 			break;
