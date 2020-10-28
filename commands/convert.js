@@ -1,22 +1,27 @@
-exports.run = (client, message, args) => {
-    var inVal = args.join(" ");
-    const pattern = /(-*\d+(\.\d+)*)\s*([a-zA-Z])/;
-    var matchArray = inVal.match(pattern);
-    console.log(matchArray)
-    var num_ = parseFloat(matchArray[1])
-    var unit = matchArray[3].toUpperCase()
+const pattern = /(-*\d+(\.\d+)*)\s*([a-zA-Z])/;
 
-    switch(unit) {
-        case "F":
-            var out = convertTemp(num_, "F")
-            message.channel.send(`That's ${out} C!`)
-            break;
-        case "C":
-            var out = convertTemp(num_, "C")
-            message.channel.send(`That's ${out} F!`)
-            break;
-        default:
-            message.channel.send(`I didn't understand what you meant by ${inVal}.`)
+module.exports = {
+    name: "convert",
+    description: "`$convert [value]\nConverts one kind of unit to another.  Currently handles temperature.",
+    execute(client, message, args) {
+        var inVal = args.join(" ");
+        var matchArray = inVal.match(pattern);
+        console.log(matchArray)
+        var num_ = parseFloat(matchArray[1])
+        var unit = matchArray[3].toUpperCase()
+
+        switch(unit) {
+            case "F":
+                var out = convertTemp(num_, "F")
+                message.channel.send(`That's ${out} C!`)
+                break;
+            case "C":
+                var out = convertTemp(num_, "C")
+                message.channel.send(`That's ${out} F!`)
+                break;
+            default:
+                message.channel.send(`I didn't understand what you meant by ${inVal}.`)
+        }
     }
 }
 

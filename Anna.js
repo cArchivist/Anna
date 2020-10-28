@@ -1,8 +1,14 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
 const fs = require("fs");
 
 const config = require("./config.json");
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`)
+  client.commands.set(command.name, command)
+}
 
 // This loop reads the /events/ folder and attaches each event file to the appropriate event.
 fs.readdir("./events/", (err, files) => {
@@ -22,25 +28,13 @@ client.on("message", message => {
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
-  // The list of if/else is replaced with those simple 2 lines:
-  try {
-	let commandPath = `./commands/${command}.js`;
-	fs.access(commandPath, (err) => {
-		if (err) {
-			console.log("Cannot access, likely not a command");
-			return;
-		}
-		// If outside of the two special channels and not the 'crit' command, just return
-		if ((message.channel.name !== "secret_shop") && (message.channel.name !== "project_debug") && !config.globalCommands.includes(command)) {
-			message.channel.send("Hey, not here!  Come find me in my shop (#secret_shop)!")
-			return;
-		}
-		let commandFile = require(commandPath);
-		commandFile.run(client, message, args);
-	});
+  // Discord recommended command handling
+  if (!client.commands.has(command)) return;
 
+  try {
+    client.commands.get(command).execute(message, config, args);
   } catch (err) {
-	message.channel.send(`Something broke: ${err}`)
+	  message.channel.send(`Something broke: ${err}`)
     console.error(err);
   }
 });
