@@ -1,6 +1,6 @@
 module.exports = {
 	name: "setClass",
-	description: "`$setclass {class}`\n Set your class in your personal server profile.",
+	description: "`$setclass {class}`\nSet your class in your personal server profile.",
 	execute(message, cfg, args) {
 		var fs = require('fs');
 		var classes = require("../classes.json");
