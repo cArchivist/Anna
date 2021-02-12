@@ -1,4 +1,7 @@
-exports.run = (client, message, args) => {
+module.exports = {
+	name: "profile",
+	description: "`$profile`\n retrieve your personal profile information that you saved in this server.  This can be modified by using `$setclass`, `$setdescription`, or `$faction`.",
+ 	execute(message, cfg, args) {
 	const Discord = require("discord.js");
 	function rank(member) {
 		if (member.roles.has("224816232732426240")) { return "Grandmaster"; }
@@ -8,22 +11,6 @@ exports.run = (client, message, args) => {
 			return "Unranked";
 		}
 	}
-		var roles = message.guild.roles.filter(function(role) {
-		if (role.name !== "Grandmaster") {
-			if (role.name !== "@everyone") {
-				if (role.name !== "Ambassador to the Outside") {
-					if (role.name !== "Villager") {
-						if (role.name !== "Lodestar") {
-							if (role.name !== "Merchant") {
-								return role;
-							}
-						}
-					}
-				}
-			}
-		}
-		//var factionRole = roles.first();
-	});
 	var member = message.guild.fetchMember(message.author)
 	console.log(`Received user info: ${member.nickname}`)
 	var name = (member.nickname != null) ? member.nickname : member.user.username;
@@ -55,4 +42,5 @@ exports.run = (client, message, args) => {
 		.addField("Member Since", `${member.joinedAt}`)
 	  message.channel.send(embedMsg).catch(console.error);
 	  return;
-};
+	}
+}
