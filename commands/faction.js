@@ -1,4 +1,7 @@
-exports.run = (client, message, args) => {
+module.exports = {
+	name: "faction",
+	description: "`$faction [faction name]`\nIf you're a Villager rank or above, you can join a faction, which changes your nickname color.",
+	execute(message, cfg, args) {
 	const Discord = require("discord.js");
 	var out_roles = [];
 	var bases = ["224816232732426240", "224946686407999499", "225089000086568960"];
@@ -9,7 +12,6 @@ exports.run = (client, message, args) => {
 			out_roles.push(bases[i]);
 		}
 	}
-		
 	
 	var opt = args[0].charAt(0).toUpperCase() + args[0].slice(1);
 	if (opt == "Colors") {
@@ -62,9 +64,7 @@ exports.run = (client, message, args) => {
 	}
 	let role = roles.exists("name", opt) ? roles.find("name", `${opt}`) : false;
 	if (!role) {
-		let commandFile = require(`../commands/help.js`);
-		commandFile.run(client, message, ["faction"]);
-		return;
+		message.channel.send(description);
 	}
 	out_roles.push(role)
 	if (out_roles.includes(role)) {
@@ -73,4 +73,5 @@ exports.run = (client, message, args) => {
 	} else {
 		message.channel.send("Something went wrong when I tried to change your faction");
 	}
-};
+}
+}

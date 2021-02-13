@@ -1,9 +1,12 @@
-exports.run = (client, message, args) => {
-	const config = require("../config.json");
-	if(message.author.id !== config.ownerID) {
-		message.channel.send("Uh-uh-uh!  You can't use that one.");
-		return;
+module.exports = {
+	name: "apologize",
+	description: "`$apologize [reason]`\nAnna apologizes for what you tell her to.",
+	execute(message, cfg, args) {
+		if(message.author.id !== cfg.ownerID) {
+			message.channel.send("Uh-uh-uh!  You can't use that one.");
+			return;
+		}
+		args = args.join(" ");
+		message.channel.send(`I'm sorry ${args}.`);
 	}
-	args = args.join(" ");
-	message.channel.send(`I'm sorry ${args}.`);
 }

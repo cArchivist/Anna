@@ -1,32 +1,23 @@
-exports.run = (client, message, args) => {
+module.exports = {
+	name: "profile",
+	description: "`$profile`\n retrieve your personal profile information that you saved in this server.  This can be modified by using `$setclass`, `$setdescription`, or `$faction`.",
+ 	execute(message, cfg, args) {
 	const Discord = require("discord.js");
 	function rank(member) {
-		if (member.roles.has("224816232732426240")) { return "Grandmaster"; }
-		else if (member.roles.has("225089000086568960")) { return "Lodestar";}
-		else if (member.roles.has("224946686407999499")) { return "Villager"; }
+		var roleCache = member.roles.cache; 
+		if (roleCache.has("224816232732426240")) { return "Grandmaster"; }
+		else if (roleCache.has("225089000086568960")) { return "Lodestar";}
+		else if (roleCache.has("224946686407999499")) { return "Villager"; }
 		else {
 			return "Unranked";
 		}
 	}
-		var roles = message.guild.roles.filter(function(role) {
-		if (role.name !== "Grandmaster") {
-			if (role.name !== "@everyone") {
-				if (role.name !== "Ambassador to the Outside") {
-					if (role.name !== "Villager") {
-						if (role.name !== "Lodestar") {
-							if (role.name !== "Merchant") {
-								return role;
-							}
-						}
-					}
-				}
-			}
-		}
-		//var factionRole = roles.first();
-	});
-	var name = (message.member.nickname != null) ? message.member.nickname : message.member.user.username;
+	var user = message.author;
+	var member = message.guild.member(user);
+	var name = member.displayName;
+	console.log(`Received user info: ${name}`);
 	var descriptions = require("../descriptions.json");
-	var id = message.author.id;
+	var id = user.id;
 	var desc;
 
 	if (descriptions.hasOwnProperty(id)) {
@@ -42,15 +33,16 @@ exports.run = (client, message, args) => {
 		memClass = "This user has no class.";
 	}
 	
-	var memberRank = rank(message.member);
-	let embedMsg = new Discord.RichEmbed()
+	var memberRank = rank(member);
+	let embedMsg = new Discord.MessageEmbed()
 		.setTitle(name)
-		.setThumbnail(message.member.user.displayAvatarURL)
+		.setThumbnail(user.displayAvatarURL())
 		.setDescription(desc)
-		.setColor(message.member.colorRole.hexColor)
-		.addField("Faction and Rank", `${message.member.colorRole.name} ${memberRank}`)
+		.setColor(member.displayHexColor)
+		.addField("Faction and Rank", `${member.roles.color.name} ${memberRank}`)
 		.addField("Class", `${memClass}`)
-		.addField("Member Since", `${message.member.joinedAt}`)
+		.addField("Member Since", `${member.joinedAt}`)
 	  message.channel.send(embedMsg).catch(console.error);
 	  return;
-};
+	}
+}
