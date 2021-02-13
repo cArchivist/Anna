@@ -1,7 +1,7 @@
 module.exports = {
 	name: "faction",
 	description: "`$faction [faction name]`\nIf you're a Villager rank or above, you can join a faction, which changes your nickname color.",
-	execute(client, message, args) {
+	execute(message, cfg, args) {
 	const Discord = require("discord.js");
 	var out_roles = [];
 	var bases = ["224816232732426240", "224946686407999499", "225089000086568960"];

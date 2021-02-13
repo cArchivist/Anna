@@ -21,6 +21,7 @@ fs.readdir("./events/", (err, files) => {
 });
 
 client.on("message", message => {
+  console.log(message);
   if (message.author.bot) return;
   if(message.content.indexOf(config.prefix) !== 0) return;
 

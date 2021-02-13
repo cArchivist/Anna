@@ -4,18 +4,20 @@ module.exports = {
  	execute(message, cfg, args) {
 	const Discord = require("discord.js");
 	function rank(member) {
-		if (member.roles.has("224816232732426240")) { return "Grandmaster"; }
-		else if (member.roles.has("225089000086568960")) { return "Lodestar";}
-		else if (member.roles.has("224946686407999499")) { return "Villager"; }
+		var roleCache = member.roles.cache; 
+		if (roleCache.has("224816232732426240")) { return "Grandmaster"; }
+		else if (roleCache.has("225089000086568960")) { return "Lodestar";}
+		else if (roleCache.has("224946686407999499")) { return "Villager"; }
 		else {
 			return "Unranked";
 		}
 	}
-	var member = message.guild.fetchMember(message.author)
-	console.log(`Received user info: ${member.nickname}`)
-	var name = (member.nickname != null) ? member.nickname : member.user.username;
+	var user = message.author;
+	var member = message.guild.member(user);
+	var name = member.displayName;
+	console.log(`Received user info: ${name}`);
 	var descriptions = require("../descriptions.json");
-	var id = message.author.id;
+	var id = user.id;
 	var desc;
 
 	if (descriptions.hasOwnProperty(id)) {
@@ -32,12 +34,12 @@ module.exports = {
 	}
 	
 	var memberRank = rank(member);
-	let embedMsg = new Discord.RichEmbed()
+	let embedMsg = new Discord.MessageEmbed()
 		.setTitle(name)
-		.setThumbnail(member.user.displayAvatarURL)
+		.setThumbnail(user.displayAvatarURL())
 		.setDescription(desc)
-		.setColor(member.colorRole.hexColor)
-		.addField("Faction and Rank", `${member.colorRole.name} ${memberRank}`)
+		.setColor(member.displayHexColor)
+		.addField("Faction and Rank", `${member.roles.color.name} ${memberRank}`)
 		.addField("Class", `${memClass}`)
 		.addField("Member Since", `${member.joinedAt}`)
 	  message.channel.send(embedMsg).catch(console.error);

@@ -12,7 +12,15 @@ module.exports = {
 		} 
 		
 		var command = args[0].toLowerCase();
+		console.log(`Requested reload of ${command}`);
 		delete require.cache[require.resolve(`./${command}.js`)];
-		message.channel.send(`Heehee!  I've got a new version of ${args[0]} to use!`);
+		try {
+			const newCommand = require(`./${command}.js`);
+			message.client.commands.set(newCommand.name, newCommand);
+			message.channel.send(`Heehee!  I've got a new version of ${args[0]} to use!`);
+		} catch (error) {
+			console.error(error);
+			message.channel.send(`There was an error while reloading a command \`${command.name}\`:\n\`${error.message}\``);
+		}
 	}
 }
