@@ -1,14 +1,23 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-const fs = require("fs");
+const { Client, Intents, Collection } = require('discord.js');
+const { config } = require('./config.json')
+const fs = require('node:fs');
 
-const config = require("./config.json");
+const client = new Client({ intents: [Intents.FLAGS.GUILDS]});
+
+client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
-  client.commands.set(command.name, command)
+  client.commands.set(command.data.name, command)
 }
+
+client.once('ready', () => {
+  console.log("Shop's open!  I'm ready for business!")
+});
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
+});
 
 // This loop reads the /events/ folder and attaches each event file to the appropriate event.
 fs.readdir("./events/", (err, files) => {
@@ -20,24 +29,5 @@ fs.readdir("./events/", (err, files) => {
   });
 });
 
-client.on("message", message => {
-  console.log(message);
-  if (message.author.bot) return;
-  if(message.content.indexOf(config.prefix) !== 0) return;
-
-  // This is the best way to define args. Trust me.
-  const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-  const command = args.shift().toLowerCase();
-
-  // Discord recommended command handling
-  if (!client.commands.has(command)) return;
-
-  try {
-    client.commands.get(command).execute(message, config, args);
-  } catch (err) {
-	  message.channel.send(`Something broke: ${err}`)
-    console.error(err);
-  }
-});
 
 client.login(config.token);

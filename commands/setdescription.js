@@ -1,7 +1,7 @@
 module.exports = {
 	name: "setDescription",
 	description: "`$setDescription {description}`\nSet the description used for you in your personal server profile",
-	execite(message, cfg, args) {
+	execute(message, cfg, args) {
 		const fs = require('fs');
 		var descriptions = require("../descriptions.json");
 		
