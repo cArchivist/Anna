@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { Discord } = require('discord.js');
-const helpers = require('./helpers/helpers.js');
+const { MessageEmbed } = require('discord.js');
+const helpers = require('../helpers/helpers.js');
 
 
 module.exports = {
@@ -29,15 +29,14 @@ module.exports = {
 		}
 		
 		var memberRank = helpers.rank(member);
-		let embedMsg = new Discord.MessageEmbed()
+		let embedMsg = new MessageEmbed()
 			.setTitle(name)
-			.setThumbnail(user.displayAvatarURL())
+			.setThumbnail(member.displayAvatarURL())
 			.setDescription(desc)
 			.setColor(member.displayHexColor)
 			.addField("Faction and Rank", `${member.roles.color.name} ${memberRank}`)
 			.addField("Class", `${memClass}`)
 			.addField("Member Since", `${member.joinedAt}`)
-		message.channel.send({ embeds: [embedMsg ]}).catch(console.error);
-		return;
+		return interaction.reply({ embeds: [embedMsg ]}).catch(console.error);
 	}
 }

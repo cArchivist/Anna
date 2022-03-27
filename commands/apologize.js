@@ -1,12 +1,19 @@
+const {SlashCommandBuilder} = require('@discordjs/builders');
+const config = require('../config.json')
+
 module.exports = {
-	name: "apologize",
-	description: "`$apologize [reason]`\nAnna apologizes for what you tell her to.",
-	execute(message, cfg, args) {
-		if(message.author.id !== cfg.ownerID) {
-			message.channel.send("Uh-uh-uh!  You can't use that one.");
+	data: new SlashCommandBuilder()
+		.setName("apologize")
+		.setDescription("Anna apologizes for what you tell her to.")
+	.addStringOption(option =>
+		option.setName("reason")
+			.setDescription("What Anna apologizes for")
+			.setRequired(true)),
+	async execute(interaction) {
+		if(interaction.member.id !== config.ownerID) {
+			interaction.reply("Uh-uh-uh!  You can't use that one.");
 			return;
 		}
-		args = args.join(" ");
-		message.channel.send(`I'm sorry ${args}.`);
+		interaction.reply(`I'm sorry ${interaction.options.getString("reason")}.`);
 	}
 }

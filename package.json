@@ -1,8 +1,9 @@
 {
 	"name": "anna",
-	"version": "1.0.0",
+	"version": "2.0.16",
 	"description": "Bot that assigns cosmetic roles to users and enables fun interaction within the server",
-	"main": "bot.js",
+	"main": "Anna.js",
+	"start": "node .",
 	"author": "Silas (crimeanarchivist)",
 	"license": "UNLICENSED",
 	"private": true,

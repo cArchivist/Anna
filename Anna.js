@@ -1,6 +1,6 @@
 const { Client, Intents, Collection } = require('discord.js');
-const { config } = require('./config.json')
-const fs = require('node:fs');
+const config = require('./config.json')
+const fs = require('fs');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS]});
 
@@ -11,23 +11,30 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command)
 }
 
-client.once('ready', () => {
-  console.log("Shop's open!  I'm ready for business!")
-});
-
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: "Hoo boy, better fix something in the back.", ephemeral: true});
+  }
 });
 
-// This loop reads the /events/ folder and attaches each event file to the appropriate event.
-fs.readdir("./events/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    let eventFunction = require(`./events/${file}`);
-    let eventName = file.split(".")[0];
-    client.on(eventName, (...args) => eventFunction.run(client, ...args));
-  });
-});
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
+for (const file of eventFiles) {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
 client.login(config.token);
