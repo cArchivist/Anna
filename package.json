@@ -1,6 +1,6 @@
 {
 	"name": "anna",
-	"version": "2.0.16",
+	"version": "2.1.2",
 	"description": "Bot that assigns cosmetic roles to users and enables fun interaction within the server",
 	"main": "Anna.js",
 	"start": "node .",

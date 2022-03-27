@@ -20,7 +20,7 @@ module.exports = {
 		delete require.cache[require.resolve(`./${command}.js`)];
 		try {
 			const newCommand = require(`./${command}.js`);
-			interaction.client.commands.set(newCommand.name, newCommand);
+			interaction.client.commands.set(newCommand.data.name, newCommand);
 			interaction.reply(`Heehee!  I've got a new version of ${command} to use!`);
 		} catch (error) {
 			console.error(error);

@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require("discord.js");
-const { rankMap } = require('../helpers/helpers.js');
-const helpers = require("../helpers/helpers.js");
+const { rankMap, cosmeticRoles } = require('../helpers/helpers.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,13 +39,13 @@ module.exports = {
 						.setRequired(true))),
 	async execute(interaction) {
 		guild = interaction.guild;
-		cosmeticRoles = helpers.cosmeticRoles(guild);
+		cosmRoles = cosmeticRoles(guild);
 		//console.log(cosmeticRoles);
 		command = interaction.options.getSubcommand();
 		if (command == "join") {
 			factionName = interaction.options.getString("faction");
 			roleName = factionName.charAt(0).toUpperCase() + factionName.slice(1);
-			let role = cosmeticRoles.find(x => x.name == roleName);
+			let role = cosmRoles.find(x => x.name == roleName);
 			if (!role) {
 				interaction.reply({ content: "I couldn't find that one.  Is it spelled correctly?", ephemeral: true});
 				return;
@@ -57,58 +56,70 @@ module.exports = {
 					return role
 				}
 			})
-			interaction.member.roles.set(ranked)
 			// add new cosmetic
-			interaction.member.roles.add(role);
+			interaction.member.roles.set(Array.from(ranked.keys()).concat([role]))
 			interaction.reply(`Boop! You're now a proud member of ${roleName}!`);
 			return;
 		} else if (command == "colors") {
-			colorRoles = cosmeticRoles.values();
+			colorRoles = Array.from(cosmRoles.values());
+			console.log(`Current number of colors: ${colorRoles.length}`);
 			let colorMessage = "**Available colors:\n**";
 			for (var i = 0; i<colorRoles.length; i++) {
 				colorMessage += (colorRoles[i].name + ": " + colorRoles[i].hexColor + "\n");
 			}
-			interaction.reply(colorMessage);
+			interaction.reply({content: colorMessage, ephemeral: true});
 			return;
 		} else if (command == "traitor") {
-			interaction.reply("Oh, so it's treachery, is it?");
-			colorRole = interaction.member.roles.color;
-			if (helpers.rankMap.has(colorRole)) {
-				interaction.followUp("Wait a minute, you don't belong to a faction.  Whom are you betraying?")
+			// find pares down to one -- should not be more than one faction at a time
+			colorRole = interaction.member.roles.cache.find(function(role) {
+				if (!rankMap.has(role.id) && role.name != "@everyone") {
+					return role;
+				}
+			});
+			if (!cosmRoles.has(colorRole.id)) {
+				interaction.reply("Wait a minute, you don't belong to a faction.  Whom are you betraying?")
 			} else {
 				interaction.member.roles.remove(colorRole);
+				interaction.reply(`Oh, so it's treachery, is it?  Fine.  You've betrayed ${colorRole.name} and your reputation suffers accordingly.`);
 			}
 			return;
 		} else if (command == "sample") {
 			factionName = interaction.options.getString("name");
 			roleName = factionName.charAt(0).toUpperCase() + factionName.slice(1);
-			let role = cosmeticRoles.find(x => x.name == roleName);
+			let role = cosmRoles.find(x => x.name == roleName);
 			if (!role) {
 				interaction.reply({ content: "I couldn't find that one.  Is it spelled correctly?", ephemeral: true});
 				return;
 			}
 			let embedMsg = new MessageEmbed()
 				.setTitle(roleName)
-				.setDescription("This is a sample message for this faction")
-				.setThumbnail(interaction.member.user.displayAvatarURL)
+				.setDescription(`This is a sample message for ${roleName}`)
+				.setThumbnail(interaction.member.displayAvatarURL())
 				.setColor(role.hexColor);
 			interaction.reply({ embeds: [embedMsg], ephemeral: true})
 		} else if (command == "found") {
+			// interaction.deferReply();
 			factionName = interaction.options.getString("name")
+			roleName = factionName.charAt(0).toUpperCase() + factionName.slice(1);
+			let existingRole = cosmRoles.find(x => x.name == roleName);
+			if (existingRole) {
+				interaction.reply({content: `We already have ${roleName}. Its color is ${existingRole.hexColor}`, ephemeral: true});
+				return;
+			}
 			color = interaction.options.getString("color")
 			interaction.guild.roles.create({
-				name: factionName,
-				color: color
-			}).then(() => {
+				name: roleName,
+				color: color,
+				position: 5
+			}).then((newRole) => {
 				// preserve ranking roles but eliminate cosmetic ones
 				ranked = interaction.member.roles.cache.filter(function(role) {
 					if (rankMap.has(role.id)) {
 						return role
 					}
 				})
-				interaction.member.roles.set(ranked)
-				// add new cosmetic
-				interaction.member.roles.add(role);
+				interaction.member.roles.set(Array.from(ranked.keys()).concat([newRole.id]))
+				interaction.reply(`You are the proud founder of a new faction, ${roleName}!  Let people everywhere be awed by its glory!`)
 			}).catch(console.error);
 		} else {
 			interaction.reply({content: `You gave me a subcommand (${command}), but I don't understand it`, ephemeral: true});

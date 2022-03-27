@@ -21,7 +21,14 @@ client.on('interactionCreate', async interaction => {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
+    errLogEntry = {
+      "caller": interaction.member.nickname,
+      "time": Date.now(),
+      "command": interaction.commandName,
+      "options": interaction.options,
+      "error": error
+    }
+    console.log(errLogEntry);
     await interaction.reply({ content: "Hoo boy, better fix something in the back.", ephemeral: true});
   }
 });
