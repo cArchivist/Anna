@@ -9,7 +9,7 @@ rankMap.set("276222043140259841", "Ambassador to the Outside");
 module.exports = {  
     rank(member) {
         var rankRole = member.roles.hoist; 
-        if (!rankMap.has(rankRole.id)) {
+        if (!rankRole || !rankMap.has(rankRole.id)) {
             return "Unranked";
         }
         return rankMap.get(rankRole.id);
