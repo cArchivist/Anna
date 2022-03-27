@@ -1,26 +1,30 @@
+const {SlashCommandBuilder} = require('@discordjs/builders');
+const config = require("../config.json");
+
 module.exports = {
-	name: "reload",
-	description: "`$reload {function}`\nUsed to dynamically reload a command while Anna is running.",
-	execute(message, cfg, args) {
-		if(message.author.id !== cfg.ownerID) {
-			message.channel.send("Uh-uh-uh!  You can't use that one.");
+	data: new SlashCommandBuilder()
+		.setName("reload")
+		.setDescription("Reload an existing command")
+		.addStringOption(option =>
+			option.setName("command")
+				.setDescription("The command to reload")
+				.setRequired(true)),
+	async execute(interaction) {
+		if(interaction.member.id !== config.ownerID) {
+			interaction.reply({content: "Uh-uh-uh!  You can't use that one.", ephemeral: true});
 			return;
 		}
-		if(!args || args.size < 1) {
-			message.reply("Please, tell me a command name to reload.");
-			return;
-		} 
 		
-		var command = args[0].toLowerCase();
+		var command = interaction.options.getString("command");
 		console.log(`Requested reload of ${command}`);
 		delete require.cache[require.resolve(`./${command}.js`)];
 		try {
 			const newCommand = require(`./${command}.js`);
-			message.client.commands.set(newCommand.name, newCommand);
-			message.channel.send(`Heehee!  I've got a new version of ${args[0]} to use!`);
+			interaction.client.commands.set(newCommand.data.name, newCommand);
+			interaction.reply(`Heehee!  I've got a new version of ${command} to use!`);
 		} catch (error) {
 			console.error(error);
-			message.channel.send(`There was an error while reloading a command \`${command.name}\`:\n\`${error.message}\``);
+			interaction.reply({content: `There was an error while reloading a command \`${command.name}\`:\n\`${error.message}\``, ephemeral: true});
 		}
 	}
 }

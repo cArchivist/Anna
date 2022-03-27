@@ -1,43 +1,47 @@
-const Discord = require("discord.js");
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-const fs = require("fs");
+const { Client, Intents, Collection } = require('discord.js');
+const config = require('./config.json')
+const fs = require('fs');
 
-const config = require("./config.json");
+const client = new Client({ intents: [Intents.FLAGS.GUILDS]});
+
+client.commands = new Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
-  client.commands.set(command.name, command)
+  client.commands.set(command.data.name, command)
 }
 
-// This loop reads the /events/ folder and attaches each event file to the appropriate event.
-fs.readdir("./events/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    let eventFunction = require(`./events/${file}`);
-    let eventName = file.split(".")[0];
-    client.on(eventName, (...args) => eventFunction.run(client, ...args));
-  });
-});
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isCommand()) return;
 
-client.on("message", message => {
-  console.log(message);
-  if (message.author.bot) return;
-  if(message.content.indexOf(config.prefix) !== 0) return;
+  const command = client.commands.get(interaction.commandName);
 
-  // This is the best way to define args. Trust me.
-  const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-  const command = args.shift().toLowerCase();
-
-  // Discord recommended command handling
-  if (!client.commands.has(command)) return;
+  if (!command) return;
 
   try {
-    client.commands.get(command).execute(message, config, args);
-  } catch (err) {
-	  message.channel.send(`Something broke: ${err}`)
-    console.error(err);
+    await command.execute(interaction);
+  } catch (error) {
+    errLogEntry = {
+      "caller": interaction.member.nickname,
+      "time": Date.now(),
+      "command": interaction.commandName,
+      "options": interaction.options,
+      "error": error
+    }
+    console.log(errLogEntry);
+    await interaction.reply({ content: "Hoo boy, better fix something in the back.", ephemeral: true});
   }
 });
+
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
 client.login(config.token);
