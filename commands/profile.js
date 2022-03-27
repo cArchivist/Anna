@@ -6,7 +6,7 @@ const helpers = require('../helpers/helpers.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("profile")
-		.setDescription("Retrieve your personal profile saved in this server. See also /setclass /setdescription and /faction"),
+		.setDescription("Retrieve your personal profile saved in this server. See also /class /description and /faction"),
 	async execute(interaction) {
 		var member = interaction.member;
 		var name = member.displayName;
@@ -18,7 +18,7 @@ module.exports = {
 		if (descriptions.hasOwnProperty(id)) {
 			desc = descriptions[id];
 		} else {
-			desc = `It's you, ${name}!  If you want to change this, use the /setDesciption command!`;
+			desc = `It's you, ${name}!  If you want to change this, use the /desciption command!`;
 		}
 		var memClass;
 		var classes = require("../classes.json");
