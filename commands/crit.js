@@ -1,7 +1,7 @@
 const {SlashCommandBuilder} = require('@discordjs/builders');
 const fs = require('fs');
 const crits = require("../crits.json");
-cachedQuotes = null;
+cachedQuotes = [];
 cacheExpiry = Date.now();
 const expiryLength = 600;
 
@@ -51,16 +51,13 @@ module.exports = {
 		command = interaction.options.getSubcommand()
 		if (command == "random") {
 			if (!cachedQuotes || Date.now() > cacheExpiry + expiryLength) {
-				var critList = [];
 				const userLists = Object.values(crits);
-				userLists.forEach(function(v) {
-					critList.concat(v);
-				})
-				cachedQuotes = critList;
+				cachedQuotes = userLists.flat();
 				cacheExpiry = Date.now();
+				console.log(`Refreshed quote cache at ${cacheExpiry}.  Currently contains ${cachedQuotes.length} items.`);
 			}
 			let quoteIdx = Math.floor(Math.random() * cachedQuotes.length);
-			interaction.reply(cachedQuotes[quoteIdx]);
+			interaction.reply({content: cachedQuotes[quoteIdx]});
 			return;
 		} else if (command == "list") {
 			if (crits.hasOwnProperty(user)) {
